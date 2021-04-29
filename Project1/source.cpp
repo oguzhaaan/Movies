@@ -3,7 +3,6 @@
 #include <sstream>
 #define QUANTITY_OF_MOVIE 250
 using namespace std;
-
 class Movie {
 private:
 	int ID;
@@ -42,6 +41,47 @@ public:
 	}
 };
 
+void idValidityChecker(int &id) {	
+	if (id > QUANTITY_OF_MOVIE + 1 || id < 1) {    // checks whether given ID by user is valid or not
+		while (id > QUANTITY_OF_MOVIE + 1 || id < 1) {
+			cout << "Please enter a valid ID (between 1-251)" << endl;
+			cin >> id;
+		}		// as long as user enters invalid ID, loop continues			
+	}	
+}
+int vote_quantityValidityChecker(int vote_quantity) { 
+	if (vote_quantity > 10 || vote_quantity < 1) {    // checks whether given quantity by user is valid or not
+		do {
+			cout << "Please enter a valid quantity. (between 1-10)" << endl;
+			cin >> vote_quantity;
+		} while (vote_quantity > 10 || vote_quantity < 1);		// as long as user enters invalid quantity, loop continues	
+		return vote_quantity;
+	}
+	else return vote_quantity;
+}
+void voteCalculator(Movie movies[], int id) {
+	int vote;
+	int temp = 0;
+	int vote_quantity;
+	idValidityChecker(id);
+	
+	cout << "Please enter how many votings that you want to do: ";
+	cin >> vote_quantity;
+
+	for (int i = 0; i < vote_quantityValidityChecker(vote_quantity); i++) {  //adds all the votes each other until the vote quantity 
+		cin >> vote;
+		if (vote > 10 || vote < 0) { //checks if given vote is valid or not
+			do {
+				cout << "Please enter a valid point (between 1-10)" << endl;
+				cin >> vote;
+			} while (vote > 10 || vote < 0);
+		}
+		temp += vote; //adds all the votes 
+	}
+	movies[(id)-1].setPoint((movies[(id)-1].getPoint() + temp) / (vote_quantity + 1)); //calculates average point
+	cout << "New point is : " << movies[id - 1].getPoint() << endl;
+
+}
 void GUI(Movie movies[]) {
 	int option;	// for specifying by user which option user wants to do
 	do {
@@ -52,7 +92,6 @@ void GUI(Movie movies[]) {
 			<< "3 - Change the point of a movie" << endl
 			<< "4 - Get movie details starting with the entered letter" << endl
 			<< "5 - Exit" << endl;
-
 		
 		cin >> option;
 		switch (option)
@@ -60,57 +99,17 @@ void GUI(Movie movies[]) {
 		case 0:
 
 			int id;
-			int vote; //entered votes
-			int	temp;
-			temp = 0;
-			int vote_quantity; //amount of vote
 			cout << "Please enter an ID to vote up the movie: ";
-			cin >> id;
-			if (id > QUANTITY_OF_MOVIE + 1 || id < 1) {    // checks whether given ID by user is valid or not
-				do {
-					cout << "Please enter a valid ID (between 1-251)" << endl;
-					cin >> id;
-				} while (id > QUANTITY_OF_MOVIE + 1 || id < 1);		// as long as user enters invalid ID, loop continues	
-			}
-
-			cout << "Please enter how many votings that you want to do: ";
-			cin >> vote_quantity;
-
-			if (vote_quantity > 10 || vote_quantity < 1) {    // checks whether given quantity by user is valid or not
-				do {
-					cout << "Please enter a valid quantity. (between 1-10)" << endl;
-					cin >> vote_quantity;
-				} while (vote_quantity > 10 || vote_quantity < 1);		// as long as user enters invalid quantity, loop continues	
-			}
-
-			cout << "Please enter your vote."<<endl;
-			for (int i = 0; i < vote_quantity; i++){  //adds all the votes each other until the vote quantity 
-				cin >> vote;
-				if (vote > 10 || vote < 0) { //checks if given vote is valid or not
-					do {
-						cout << "Please enter a valid point (between 1-10)" << endl;
-						cin >> vote;
-					} while (vote > 10 || vote < 0);
-				}
-				temp += vote; //adds all the votes 
-			}
-			movies[id - 1].setPoint((movies[id - 1].getPoint() + temp) / (vote_quantity+1)); //calculates average point
-			cout << "New point is : "<<movies[id - 1].getPoint()<<endl;
+			cin >> id;		
+			voteCalculator(movies,id);
 			break;
 
 		case 1:
 			
 			cout << "Please enter an ID: ";
-			cin >> id;
-			if (id > QUANTITY_OF_MOVIE + 1 || id < 1) {  // checks whether given ID by user is valid or not
-				do {
-					cout << "Please enter a valid ID (between 1-251)" << endl;
-					cin >> id;
-				} while (id > QUANTITY_OF_MOVIE + 1 || id < 1);
-			}
-
-			cout << "Details :" << endl; 
-			movies[id - 1].printMovie(); 
+			cin >> id;			
+			idValidityChecker(id);
+			movies[(id) - 1].printMovie();
 			break;
 
 		case 2:
@@ -120,7 +119,8 @@ void GUI(Movie movies[]) {
 			cin >> year2;
 
 			for (int i = 0; i <= QUANTITY_OF_MOVIE; i++) {
-				if (movies[i].getYear() >= year1 && movies[i].getYear() <= year2 || movies[i].getYear() >= year2 && movies[i].getYear() <= year1) { //lists the movies which are in between entered years
+				if (movies[i].getYear() >= year1 && movies[i].getYear() <= year2 ||
+					movies[i].getYear() >= year2 && movies[i].getYear() <= year1) { //lists the movies which are in between entered years
 					movies[i].printMovie();
 				}
 			}
@@ -130,19 +130,12 @@ void GUI(Movie movies[]) {
 			float new_point;
 			cout << "Please enter a valid ID in order to change the point of a movie: " << endl;
 			cin >> id;
-
-			if (id > QUANTITY_OF_MOVIE + 1 || id < 1) { // checks whether given ID by user is valid or not
-				do {
-					cout << "Please enter a valid ID (between 1-251)" << endl;
-					cin >> id;
-				} while (id > QUANTITY_OF_MOVIE + 1 || id < 1);
-			}
-
+			idValidityChecker(id);
 			cout << "Please enter new point.";
 			cin >> new_point;
-			movies[id - 1].setPoint(new_point); //the value which entered by user will be assigned as new point of the movie
+			movies[(id) - 1].setPoint(new_point); //the value which entered by user will be assigned as new point of the movie
 			cout << "Changes has been saved. New details about the movie: " << endl;
-			movies[id - 1].printMovie();
+			movies[(id) - 1].printMovie();
 			break;
 
 
